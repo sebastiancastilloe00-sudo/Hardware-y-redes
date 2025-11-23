@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardware & Redes - Aprendizaje Interactivo PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --secondary: #ff6b6b;
+            --dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--gradient);
+            color: white;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, #00d4ff, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .subtitle { font-size: 1.3rem; opacity: 0.9; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 20px; }
+
+        /* Tarjetas de conceptos - EFECTO GLASS + ANIMACIÓN */
+        .conceptos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        .card {
+            background: var(--glass);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 20px 50px rgba(0,212,255,0.4);
+        }
+        .card h3 {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        .card .content {
+            padding: 25px;
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+        .card.active .content { display: block; }
+        .card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin: 15px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .key { background: rgba(0,212,255,0.3); padding: 5px 12px; border-radius: 20px; display: inline-block; margin: 5px; font-weight: bold; }
+
+        /* Cuestionario - Estilo premium */
+        #quizSection {
+            margin-top: 60px;
+            background: rgba(15,23,42,0.8);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(0,212,255,0.3);
+        }
+        #inicioQuiz {
+            text-align: center;
+            padding: 30px;
+        }
+        input[type="text"] {
+            padding: 15px 20px;
+            width: 350px;
+            max-width: 90%;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        button {
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(0,212,255,0.4);
+        }
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,212,255,0.6);
+        }
+
+        .pregunta {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 6px solid var(--primary);
+        }
+        .opciones label {
+            display: block;
+            background: rgba(255,255,255,0.15);
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .opciones label:hover {
+            background: rgba(0,212,255,0.4);
+            transform: translateX(10px);
+        }
+
+        #resultados {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+        }
+        .score {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00ffaa, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .conceptos { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><i class="fas fa-microchip"></i> Hardware & Redes</h1>
+        <p class="subtitle">Aprendizaje interactivo • Haz clic en cada tarjeta para explorar</p>
+    </header>
+
+    <div class="container">
+
+        <!-- CONCEPTOS INTERACTIVOS -->
+        <section class="conceptos">
+            <div class="card">
+                <h3><i class="fas fa-brain"></i> CPU - Procesador</h3>
+                <div class="content">
+                    <img src="https://images.unsplash.com/photo-1591797452530-0e5f1b2d9e03?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="CPU">
+                    <p>El <strong>cerebro del ordenador</strong>. Ejecuta instrucciones y realiza millones de cálculos por segundo.</p>
+                    <span class="key">Núcleos</span>
+                    <span class="key">Hilos</span>
+                    <span class="key">Frecuencia (GHz)</span>
+                    <span class="key">Caché L3</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-memory"></i> RAM</h3>
+                <div class="content">
+                    <img src="https://images.unsplash.com/photo-1613495948670-5b9e35e1e21e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="RAM">
+                    <p>Memoria volátil ultrarrápida. Cuanta más RAM → más programas abiertos sin lentitud.</p>
+                    <p>Tipos actuales: <strong>DDR4</strong> y <strong>DDR5</strong></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-hdd"></i> HDD vs SSD</h3>
+                <div class="content">
+                    <img src="https://images.unsplash.com/photo-1618390893957-4c1d6e82e3a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="SSD">
+                    <p><strong>SSD</strong>: hasta 10 veces más rápido que HDD<br>
+                       <strong>HDD</strong>: más barato por GB, ideal para almacenamiento masivo</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-network-wired"></i> Modelo OSI (7 capas)</h3>
+                <div class="content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/OSI_Model_es.svg/1200px-OSI_Model_es.svg.png" alt="Modelo OSI">
+                    <ol>
+                        <li>Física (cables, señales)</li>
+                        <li>Enlace (MAC, switches)</li>
+                        <li>Red (IP, routers)</li>
+                        <li>Transporte (TCP/UDP)</li>
+                        <li>Sesión</li>
+                        <li>Presentación</li>
+                        <li>Aplicación (HTTP, DNS)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-location-dot"></i> Dirección IP</h3>
+                <div class="content">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="IP">
+                    <p>Identificador único en la red.</p>
+                    <p><strong>IPv4</strong>: 192.168.0.1 → 32 bits<br>
+                       <strong>IPv6</strong>: 2001:0db8::1 → 128 bits</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-router"></i> Router vs Switch</h3>
+                <div class="content">
+                    <img src="https://images.unsplash.com/photo-1629652781408-8cacc2d7b8c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Router">
+                    <p><strong>Switch</strong>: conecta dispositivos en la MISMA red (LAN)<br>
+                       <strong>Router</strong>: conecta REDES diferentes (Internet)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CUESTIONARIO INTERACTIVO -->
+        <section id="quizSection">
+            <div id="inicioQuiz">
+                <h2><i class="fas fa-gamepad"></i> ¡Desafío Final: 10 Preguntas!</h2>
+                <p>Ingresa tu nombre para comenzar</p>
+                <input type="text" id="nombreEstudiante" placeholder="   ¿Cómo te llamas?" required>
+                <br><br>
+                <button onclick="iniciarCuestionario()">¡EMPEZAR AHORA!</button>
+            </div>
+
+            <div id="preguntasContainer"></div>
+            <div style="text-align:center; margin:30px 0;">
+                <button onclick="corregirCuestionario()" id="btnCorregir" style="display:none; padding:15px 50px; font-size:1.3rem;">
+                    <i class="fas fa-check-circle"></i> Corregir Cuestionario
+                </button>
+            </div>
+            <div id="resultados"></div>
+        </section>
+    </div>
+
+    <script>
+        // Activar tarjetas
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.toggle('active');
+            });
+        });
+
+        // Banco de 18 preguntas (siempre salen 10 aleatorias)
+        const bancoPreguntas = [
+            { pregunta: "¿Qué componente es el 'cerebro' del PC?", opciones: ["GPU", "CPU", "RAM", "SSD"], correcta: 1 },
+            { pregunta: "¿Qué memoria se borra al apagar el equipo?", opciones: ["SSD", "ROM", "RAM", "HDD"], correcta: 2 },
+            { pregunta: "¿En qué capa OSI opera el protocolo IP?", opciones: ["Capa 1", "Capa 2", "Capa 3", "Capa 7"], correcta: 2 },
+            { pregunta: "¿Cuál es más rápido?", opciones: ["HDD", "SSD", "DVD", "USB 2.0"], correcta: 1 },
+            { pregunta: "¿Qué dispositivo conecta redes diferentes?", opciones: ["Switch", "Hub", "Router", "Access Point"], correcta: 2 },
+            { pregunta: "¿Qué protocolo usa el puerto 443?", opciones: ["HTTP", "HTTPS", "FTP", "SSH"], correcta: 1 },
+            { pregunta: "¿Cuántos bits tiene IPv4?", opciones: ["16", "32", "64", "128"], correcta: 1 },
+            { pregunta: "¿Qué significa LAN?", opciones: ["Large Area Network", "Local Area Network", "Long Area Network", "Link Area Network"], correcta: 1 },
+            { pregunta: "¿Qué protocolo garantiza entrega ordenada y sin errores?", opciones: ["UDP", "TCP", "IP", "ICMP"], correcta: 1 },
+            { pregunta: "¿Qué dispositivo opera principalmente en capa 2?", opciones: ["Router", "Switch", "Firewall", "Modem"], correcta: 1 },
+            { pregunta: "¿Qué significa DHCP?", opciones: ["Asignación automática de IP", "Protocolo de encriptación", "Servidor web", "Firewall"], correcta: 0 },
+            { pregunta: "¿Qué cable se usa en redes Gigabit Ethernet?", opciones: ["Coaxial", "Fibra óptica", "Cat5e/Cat6", "Serie"], correcta: 2 },
+            { pregunta: "¿Qué puerto usa HTTP?", opciones: ["21", "80", "443", "3389"], correcta: 1 },
+            { pregunta: "¿Qué capa OSI maneja el cifrado SSL/TLS?", opciones: ["Transporte", "Presentación", "Aplicación", "Sesión"], correcta: 1 },
+            { pregunta: "¿Qué dirección es física y única por tarjeta de red?", opciones: ["IP", "MAC", "DNS", "Gateway"], correcta: 1 },
+            { pregunta: "¿Qué significa NAT?", opciones: ["Network Address Translation", "New Access Technology", "Node Authentication Tool", "Ninguna"], correcta: 0 },
+            { pregunta: "¿Qué protocolo usa DNS?", opciones: ["TCP", "UDP puerto 53", "ICMP", "ARP"], correcta: 1 },
+            { pregunta: "¿Qué componente mejora el rendimiento gráfico en juegos?", opciones: ["CPU", "RAM", "SSD", "GPU"], correcta: 3 }
+        ];
+
+        let preguntasSeleccionadas = [];
+        let nombre = "";
+
+        function iniciarCuestionario() {
+            nombre = document.getElementById("nombreEstudiante").value.trim();
+            if (!nombre) return alert("¡Escribe tu nombre para continuar!");
+
+            const shuffled = [...bancoPreguntas].sort(() => Math.random() - 0.5);
+            preguntasSeleccionadas = shuffled.slice(0, 10);
+
+            document.getElementById("inicioQuiz").style.display = "none";
+            const cont = document.getElementById("preguntasContainer");
+            cont.innerHTML = "";
+
+            preguntasSeleccionadas.forEach((p, i) => {
+                let html = `<div class="pregunta">
+                    <strong>${i+1}. ${p.pregunta}</strong>
+                    <div class="opciones">`;
+                p.opciones.forEach((op, j) => {
+                    html += `<label><input type="radio" name="q${i}" value="${j}"> ${op}</label>`;
+                });
+                html += `</div></div>`;
+                cont.innerHTML += html;
+            });
+
+            document.getElementById("btnCorregir").style.display = "inline-block";
+        }
+
+        function corregirCuestionario() {
+            let aciertos = 0;
+            const detalles = [];
+
+            preguntasSeleccionadas.forEach((p, i) => {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if (sel && parseInt(sel.value) === p.correcta) {
+                    aciertos++;
+                    detalles.push(`<p style="color:#00ffaa"><i class="fas fa-check"></i> Pregunta ${i+1}: ¡Correcta!</p>`);
+                } else {
+                    const correcta = p.opciones[p.correcta];
+                    detalles.push(`<p style="color:#ff6b6b"><i class="fas fa-times"></i> Pregunta ${i+1}: Incorrecta → <strong>${correcta}</strong></p>`);
+                }
+            });
+
+            const nota = (aciertos * 10).toFixed(0);
+            document.getElementById("btnCorregir").style.display = "none";
+            document.getElementById("resultados").innerHTML = `
+                <h2>¡Excelente, ${nombre}!</h2>
+                <div class="score">${aciertos}/10</div>
+                <h3>Calificación: <strong>${nota}%</strong></h3>
+                <div style="margin-top:30px; text-align:left; max-width:600px; margin:30px auto;">
+                    ${detalles.join("")}
+                </div>
+                <button onclick="location.reload()" style="margin-top:20px; padding:15px 40px;">
+                    <i class="fas fa-redo"></i> Intentar de nuevo
+                </button>
+            `;
+        }
+    </script>
+</body>
+</html>
